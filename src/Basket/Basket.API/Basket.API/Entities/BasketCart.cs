@@ -3,12 +3,10 @@ using MongoDB.Bson;
 
 namespace Basket.API.Entities
 {
+    [BsonIgnoreExtraElements]
     public class BasketCart
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
-
+        [BsonElement("UserName")]
         public string UserName { get; set; }
         public List<MotorcycleRental> MotorcycleRentals { get; set; } = new List<MotorcycleRental>();
         public decimal TotalPrice => CalculateTotalPrice();

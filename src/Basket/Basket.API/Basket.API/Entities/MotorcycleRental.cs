@@ -2,7 +2,7 @@
 {
     public class MotorcycleRental
     {
-        public string Id { get; set; }
+        //public string Id { get; set; }
         public string UserName { get; set; }
         public Motorcycle Motorcycle { get; set; }
         public DateTime StartDate { get; set; }

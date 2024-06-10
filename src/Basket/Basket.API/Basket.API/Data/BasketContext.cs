@@ -15,6 +15,9 @@ namespace Basket.API.Data
             _database = client.GetDatabase(settings.Value.DatabaseName);
 
             BasketCarts = _database.GetCollection<BasketCart>(settings.Value.CollectionName);
+
+            var userNameIndexForBasketCart = Builders<BasketCart>.IndexKeys.Ascending(basket => basket.UserName);
+            BasketCarts.Indexes.CreateOne(new CreateIndexModel<BasketCart>(userNameIndexForBasketCart));
         }
 
         public IMongoCollection<BasketCart> BasketCarts { get; }

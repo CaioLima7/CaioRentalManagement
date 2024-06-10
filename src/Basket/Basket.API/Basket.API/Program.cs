@@ -6,6 +6,9 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Basket.API.Settings;
 using System.Reflection;
+using EventBusRabbitMQ.Producer;
+using EventBusRabbitMQ;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,29 @@ builder.Services.Configure<BasketDatabaseSettings>(
 
 builder.Services.AddTransient<IBasketRepository, BasketRepository>();
 builder.Services.AddSingleton<IBasketContext, BasketContext>();
+builder.Services.AddSingleton<IRabbitMQConnection>(sp =>
+{
+    var configuration = builder.Configuration;
+    var factory = new ConnectionFactory()
+    {
+        HostName = configuration["EventBus:HostName"]
+    };
+
+    if (!string.IsNullOrEmpty(configuration["EventBus:UserName"]))
+    {
+        factory.UserName = configuration["EventBus:UserName"];
+    }
+
+    if (!string.IsNullOrEmpty(configuration["EventBus:Password"]))
+    {
+        factory.Password = configuration["EventBus:Password"];
+    }
+
+    return new RabbitMQConnection(factory);
+});
+
+builder.Services.AddSingleton<EventBusRabbitMQProducer>();
+
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
