@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ordering.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ordering.Core.Repositories.Base
 {
-    public interface IRepository<T> // where T : Entity
+    public interface IRepository<T> where T : Entity
     {
         Task<IReadOnlyList<T>> GetAllAsync();
         Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate);

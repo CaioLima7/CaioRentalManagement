@@ -1,6 +1,6 @@
-﻿using Catalog.API.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using Catalog.API.Entities;
 using Catalog.API.Repositories.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.API.Controllers
 {
