@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Ordering.Application.Commands;
 using Ordering.Application.Responses;
 using Ordering.Core.Entities;
@@ -14,32 +15,20 @@ namespace Ordering.Application.Handlers
     public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, OrderResponse>
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IMapper _mapper;
 
-        public CreateOrderCommandHandler(IOrderRepository orderRepository)
+        public CreateOrderCommandHandler(IOrderRepository orderRepository, IMapper mapper)
         {
             _orderRepository = orderRepository;
+            _mapper = mapper;
         }
 
         public async Task<OrderResponse> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            var order = new Order
-            {
-                UserName = request.UserName,
-                OrderDate = request.OrderDate,
-                OrderItems = request.OrderItems,
-                TotalPrice = request.TotalPrice
-            };
-
-            await _orderRepository.AddAsync(order);
-
-            return new OrderResponse
-            {
-                Id = order.Id,
-                UserName = order.UserName,
-                OrderDate = order.OrderDate,
-                OrderItems = order.OrderItems,
-                TotalPrice = order.TotalPrice
-            };
+            var orderEntity = _mapper.Map<Order>(request);
+            var newOrder = await _orderRepository.AddAsync(orderEntity);
+            return _mapper.Map<OrderResponse>(newOrder);
         }
     }
+
 }

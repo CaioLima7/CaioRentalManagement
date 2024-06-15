@@ -22,7 +22,9 @@ namespace EventBusRabbitMQ.Producer
         {
             using (var channel = _connection.CreateModel())
             {
-                channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+                channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                channel.ExchangeDeclare(exchange: "RentalExchange", type: ExchangeType.Direct, durable: true);
+
                 var message = JsonConvert.SerializeObject(publishModel);
                 var body = Encoding.UTF8.GetBytes(message);
 
@@ -31,15 +33,16 @@ namespace EventBusRabbitMQ.Producer
                 properties.DeliveryMode = 2;
 
                 channel.ConfirmSelect();
-                channel.BasicPublish(exchange: "RentalExchange", routingKey: queueName, mandatory: true, basicProperties: properties, body: body);
-                channel.WaitForConfirmsOrDie();
 
                 channel.BasicAcks += (sender, eventArgs) =>
                 {
-                    Console.WriteLine("Sent RabbitMQ");
-                    // ack handle
+                    // handle
+                    Console.WriteLine($"Message sent to RabbitMQ");
                 };
-                channel.ConfirmSelect();
+
+                channel.BasicPublish(exchange: "RentalExchange", routingKey: queueName, mandatory: true, basicProperties: properties, body: body);
+
+                channel.WaitForConfirmsOrDie();
             }
         }
     }

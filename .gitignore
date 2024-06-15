@@ -396,3 +396,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/tests/Tests.Catalog.API/Basket.IntegrationTests/BasketApiIntegrationTests.cs

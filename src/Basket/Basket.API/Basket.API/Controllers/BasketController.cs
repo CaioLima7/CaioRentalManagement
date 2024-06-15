@@ -56,13 +56,14 @@ namespace Basket.API.Controllers
             var basket = await _repository.GetBasket(basketCheckout.UserName);
             if (basket == null)
             {
-                return BadRequest();
+                return BadRequest("Basket not found.");
             }
 
             var basketRemoved = await _repository.DeleteBasket(basket.UserName);
             if (!basketRemoved)
             {
-                return BadRequest();
+                //log
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while attempting to remove the basket. Please try again.");
             }
 
             var eventMessage = _mapper.Map<RentalCheckoutEvent>(basketCheckout);
@@ -73,9 +74,9 @@ namespace Basket.API.Controllers
             {
                 _eventBus.PublishBasketCheckout(EventBusConstants.BasketCheckoutQueue, eventMessage);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
 
             return Accepted();

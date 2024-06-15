@@ -13,8 +13,9 @@ namespace Ordering.Application.Commands
         public List<OrderItems> OrderItems { get; set; }
         public decimal TotalPrice { get; set; }
 
-        public CreateOrderCommand(string userName, DateTime orderDate, List<OrderItems> orderItems, 
-            decimal totalPrice)
+        public CreateOrderCommand() { }
+
+        public CreateOrderCommand(string userName, DateTime orderDate, List<OrderItems> orderItems, decimal totalPrice)
         {
             UserName = userName;
             OrderDate = orderDate;

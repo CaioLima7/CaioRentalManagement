@@ -2,29 +2,29 @@
 
 namespace Ordering.API.Extentions
 {
-    public static class ApplicationBuilderExtentions
+    public static class ApplicationBuilderExtensions
     {
-        public static EventBusRabbitMQConsumer Listener { get; set; }
-
         public static IApplicationBuilder UseRabbitListener(this IApplicationBuilder app)
         {
-            Listener = app.ApplicationServices.GetService<EventBusRabbitMQConsumer>();
             var life = app.ApplicationServices.GetService<IHostApplicationLifetime>();
 
-            life.ApplicationStarted.Register(OnStarted);
-            life.ApplicationStopping.Register(OnStopping);
+            life.ApplicationStarted.Register(() =>
+            {
+                var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+                using var scope = scopeFactory.CreateScope();
+                var listener = scope.ServiceProvider.GetRequiredService<EventBusRabbitMQConsumer>();
+                listener.Consume();
+            });
+
+            life.ApplicationStopping.Register(() =>
+            {
+                var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+                using var scope = scopeFactory.CreateScope();
+                var listener = scope.ServiceProvider.GetRequiredService<EventBusRabbitMQConsumer>();
+                listener.Disconnect();
+            });
 
             return app;
-        }
-
-        private static void OnStarted()
-        {
-            Listener.Consume();
-        }
-
-        private static void OnStopping()
-        {
-            Listener.Disconnect();
         }
     }
 }

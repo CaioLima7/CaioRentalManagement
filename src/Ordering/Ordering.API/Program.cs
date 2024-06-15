@@ -1,5 +1,6 @@
 using EventBusRabbitMQ;
 using Microsoft.EntityFrameworkCore;
+using Ordering.API.Extentions;
 using Ordering.API.RabbitMQ;
 using Ordering.Application.Commands;
 using Ordering.Application.Handlers;
@@ -18,8 +19,7 @@ var Configuration = builder.Configuration;
 builder.Services.AddDbContext<OrderContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("OrderConnection")));
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped(typeof(IOrderRepository), typeof(OrderRepository));
+builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 
 
@@ -33,7 +33,7 @@ builder.Services.AddSingleton<IRabbitMQConnection>(sp =>
 {
     var factory = new ConnectionFactory()
     {
-        HostName = Configuration["EventBus:HostName"]
+        HostName = Configuration["EventBus:HostName"],
     };
 
     if (!string.IsNullOrEmpty(Configuration["EventBus:UserName"]))
@@ -71,5 +71,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseRabbitListener();
 
 app.Run();
