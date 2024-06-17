@@ -9,7 +9,7 @@ using System.Net;
 
 namespace Basket.API.Controllers
 {
-    [Route("api/v1/[controller]")]
+    [Route("api/basket/[controller]")]
     [ApiController]
     public class BasketController : ControllerBase
     {

@@ -1,5 +1,7 @@
 using EventBusRabbitMQ;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Ordering.API.Extentions;
 using Ordering.API.RabbitMQ;
 using Ordering.Application.Commands;
@@ -11,6 +13,7 @@ using Ordering.Infrastructure.Repositories;
 using Ordering.Infrastructure.Repositories.Base;
 using RabbitMQ.Client;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +53,35 @@ builder.Services.AddSingleton<IRabbitMQConnection>(sp =>
 });
 
 builder.Services.AddScoped<EventBusRabbitMQConsumer>();
+
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+builder.Services.AddSingleton(jwtSettings);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
+    };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("DeliveryPolicy", policy => policy.RequireRole("Delivery"));
+});
+
 
 
 builder.Services.AddControllers();

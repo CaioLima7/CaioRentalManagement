@@ -5,7 +5,7 @@ using Catalog.API.Repositories.Interfaces;
 namespace Catalog.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/catalog/[controller]")]
     public class MotorcyclesController : ControllerBase
     {
         private readonly IMotorcycleRepository _repository;
