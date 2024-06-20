@@ -1,0 +1,19 @@
+<div class="login-wrapper">
+  <mat-card class="login-card">
+    <img src="assets/rentalKeysIcon.jfif" class="login-icon" alt="Rental Keys Icon">
+    <mat-card-title>CaioRentalManagement</mat-card-title>
+    <mat-card-content>
+      <form (submit)="login()">
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput placeholder="Username" [(ngModel)]="loginData.username" name="username">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput placeholder="Password" [(ngModel)]="loginData.password" name="password" type="password">
+        </mat-form-field>
+        <button mat-raised-button color="primary" class="full-width" type="submit">Login</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -6,6 +6,21 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var webAppUrl = builder.Configuration["WebApp:url"];
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("WebAppOrigin",
+        builder =>
+        {
+            builder
+                   //.WithOrigins(webAppUrl)
+                   .AllowAnyOrigin()
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddSingleton<JwtSettings>(sp =>
     sp.GetRequiredService<IOptions<JwtSettings>>().Value);
@@ -30,7 +45,7 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseCors("WebAppOrigin");
 
 app.UseAuthentication();
 

@@ -6,6 +6,19 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var webAppUrl = builder.Configuration["WebApp:url"];
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("WebAppOrigin",
+        builder =>
+        {
+            builder.WithOrigins(webAppUrl)
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
 builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 {
     config.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
@@ -32,6 +45,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
+
+app.UseCors("WebAppOrigin");
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.StatusCode = 204;
+        return;
+    }
+
+    await next();
+});
 
 app.UseAuthentication();
 
